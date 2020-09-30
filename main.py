@@ -18,19 +18,14 @@ Recalls:
 
 import requests
 import json
-
-RESOURCE_IDS = ["053cea08-09bc-40ec-8f7a-156f0677aff3","851ecab1-0622-4dbe-a6c7-f950cf82abf9","03adc637-b6fe-402b-9937-7c3d3afc9140","83bfb278-7be1-4dab-ae2d-40125a923da1"]
-GENERIC_URL = "https://data.gov.il/api/3/action/datastore_search?resource_id="
-GENERIC_DATA = {'resource_id':None, #Contained in the url, depends on what API we are requesting
-        'limit':1,  #limits the amount of answers
-        'q':None} #The Query (Pretty much what the user provides)
-REQUEST_TYPE = 'POST'
+from config import *
 
 def main():
     print(query_apis("9489419")[0]['success']) #Simple Check weather the first api was good
     print(query_apis("9489419")[1]['success'])
     print(query_apis("9489419")[2]['success'])
     print(query_apis("9489419")[3]['success'])
+    
 
 
 def query_apis(q):
@@ -43,6 +38,12 @@ def query_apis(q):
         raw_reply = requests.request(REQUEST_TYPE,url,data=data)
         replies.append(json.loads(raw_reply.text))
     return replies
+
+
+def tele_reply(reply):
+    url = ""
+    pass
+
 
 
 if __name__ == '__main__':
