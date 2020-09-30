@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """General Notes
 
 
@@ -15,20 +18,24 @@ Recalls:
 
 """
 
-
 import requests
 import json
 from config import *
 
+CURR_OFFSET = "0"
+
 def main():
-    print(query_apis("9489419")[0]['success']) #Simple Check weather the first api was good
-    print(query_apis("9489419")[1]['success'])
-    print(query_apis("9489419")[2]['success'])
-    print(query_apis("9489419")[3]['success'])
-    
+    #print(query_apis("9489419")[0]['success']) #Simple Check weather the first api was good
+    #print(query_apis("9489419")[1]['success'])
+    #print(query_apis("9489419")[2]['success'])
+    #print(query_apis("9489419")[3]['success'])
+    tele_reply("Hi","824323813")
+    while True:
+        print(CURR_OFFSET)
+        print(get_updates()) 
 
 
-def query_apis(q):
+def _query_apis(q):
     replies = [] #list of the returned jsons (a list of dicts)
     for resource_id in RESOURCE_IDS:
         url = GENERIC_URL + resource_id
@@ -36,15 +43,54 @@ def query_apis(q):
         data['resource_id'] = resource_id
         data['q'] = q
         raw_reply = requests.request(REQUEST_TYPE,url,data=data)
+#        raw_reply = raw_reply.decode("utf-8")
         replies.append(json.loads(raw_reply.text))
     return replies
 
 
-def tele_reply(reply):
-    url = ""
-    pass
+def tele_reply(reply, chat_id):
+    url = GENERIC_TELEGRAM_API + TELEGRAM_BOT_TOKEN + "/sendMessage"
+    data = {"chat_id" : chat_id,
+            "text" : reply}
+    print("=============The message that sent:" + reply) #DEBUG
+    sent = requests.request("POST",url,data=data)
+    print(sent.text) #DEBUG
+
+def get_updates():
+    print(CURR_OFFSET) #DEBUG
+    url = GENERIC_TELEGRAM_API + TELEGRAM_BOT_TOKEN + "/getUpdates" + "?offset=" + CURR_OFFSET + "?timeout=100"
+    updates = requests.request("GET",url)
+    _parse_update(json.loads(updates.text))
+
+def _parse_update(raw_reply):
+    updates = raw_reply["result"]
+    if updates: #Pretty much always true.
+        for req in updates:
+            global CURR_OFFSET 
+            CURR_OFFSET = str(req["update_id"]+1)
+            print(CURR_OFFSET) #DEBUG
+            try:
+                car_num = req["message"]["text"]
+            except:
+                car_num = None
+            chat_id = req["message"]["from"]["id"] #Supposed to be present otherwise there wont be an update.
+        print("the message from the user:" + car_num) #DEBUG
+        reply = compose_message(car_num)
+        tele_reply(reply,chat_id)
 
 
+def compose_message(car_num):
+    if car_num.isdigit():
+        if len(car_num) > 6:
+            api_reply = _query_apis(car_num)
+            composed_message = json.dumps(api_reply[0]["result"]["records"],indent=2,ensure_ascii=False)
+            print(composed_message) #DEBUG
+            return composed_message
+    else:
+        return "Invalid Input"
+
+    
+    
 
 if __name__ == '__main__':
     main()

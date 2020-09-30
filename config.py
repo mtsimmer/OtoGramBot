@@ -28,3 +28,4 @@ REQUEST_TYPE = "POST"
 TELEGRAM_BOT_TOKEN = ""
 
 GENERIC_TELEGRAM_API = "https://api.telegram.org/bot"
+INITIAL_OFFSET = "1"
