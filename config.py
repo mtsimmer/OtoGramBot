@@ -23,7 +23,8 @@ GENERIC_DATA = {'resource_id':None, #Contained in the url, depends on what API w
                 'limit':1, #lmits the amount of answers.
                 'q':None} #The Query (Pretty much what the user provides).
 REQUEST_TYPE = "POST"
-
+#Extra Rsource IDS
+RECALL_RESOURCE_ID = "2c33523f-87aa-44ec-a736-edbb0a82975e"
 #Make sure to remove before commit.
 TELEGRAM_BOT_TOKEN = ""
 
