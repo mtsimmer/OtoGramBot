@@ -31,8 +31,7 @@ def main():
     #print(query_apis("9489419")[3]['success'])
     tele_reply("Hi","824323813")
     while True:
-        print(CURR_OFFSET)
-        print(get_updates()) 
+        get_updates()
 
 
 def _query_apis(q):
@@ -75,20 +74,23 @@ def _parse_update(raw_reply):
                 car_num = None
             chat_id = req["message"]["from"]["id"] #Supposed to be present otherwise there wont be an update.
         print("the message from the user:" + car_num) #DEBUG
-        reply = compose_message(car_num)
-        tele_reply(reply,chat_id)
+        reply = compose_message(car_num, chat_id)
+        #tele_reply(reply,chat_id)
 
 
-def compose_message(car_num):
+def compose_message(car_num, chat_id):
     if car_num.isdigit():
         if len(car_num) > 6:
-            api_reply = _query_apis(car_num)
-            composed_message = json.dumps(api_reply[0]["result"]["records"],indent=2,ensure_ascii=False)
-            print(composed_message) #DEBUG
-            return composed_message
+            api_replies = _query_apis(car_num)
+            for api_reply in api_replies:
+                composed_message = json.dumps(api_reply["result"]["records"],indent=2,ensure_ascii=False)
+                print(composed_message) #DEBUG
+                tele_reply(composed_message,chat_id)
     else:
-        return "Invalid Input"
+        tele_reply("Invalid Input",chat_id)
 
+def check_recall():
+    pass
     
     
 
